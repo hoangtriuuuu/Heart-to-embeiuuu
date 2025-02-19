@@ -1,14 +1,14 @@
 document.addEventListener("DOMContentLoaded", function() {
     const heartShape = [
-        [50, 20], [40, 10], [30, 15], [25, 25], [28, 40],
-        [35, 55], [50, 75], [65, 55], [72, 40], [75, 25],
-        [70, 15], [60, 10], [50, 20]
+        [50, 20], [42, 12], [35, 18], [30, 30], [33, 45],
+        [40, 55], [50, 70], [60, 55], [67, 45], [70, 30],
+        [65, 18], [58, 12], [50, 20]
     ];
 
     const textShape = [
-        [40, 60], [45, 60], [50, 60], [55, 60], [60, 60],  // "A"
-        [42, 65], [48, 65], [52, 65], [58, 65], [62, 65],  // "n"
-        [44, 70], [50, 70], [54, 70], [60, 70], [64, 70],  // "h"
+        [45, 60], [50, 60], [55, 60], // "A"
+        [46, 65], [52, 65], [58, 65], // "n"
+        [48, 70], [54, 70], [60, 70]  // "h"
     ];
 
     const container = document.getElementById("heartContainer");
@@ -25,18 +25,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function animateParticles(container, className, delay) {
-        setTimeout(() => {
-            let particles = container.getElementsByClassName(className);
-            Array.from(particles).forEach(particle => {
-                particle.style.opacity = 1;
-                particle.style.transform = "scale(1.2)";
-            });
-        }, delay);
+        let particles = container.getElementsByClassName(className);
+        let index = 0;
+
+        function animate() {
+            if (index < particles.length) {
+                particles[index].style.opacity = 1;
+                particles[index].style.transform = "scale(1.3)";
+                index++;
+                requestAnimationFrame(animate);
+            }
+        }
+
+        setTimeout(() => animate(), delay);
     }
 
     createParticles(heartShape, container, "particle");
     createParticles(textShape, textContainer, "text-particle");
 
     setTimeout(() => animateParticles(container, "particle", 500), 500);
-    setTimeout(() => animateParticles(textContainer, "text-particle", 1500), 2000);
+    setTimeout(() => animateParticles(textContainer, "text-particle", 1200), 2000);
 });
