@@ -9,26 +9,10 @@ body {
     position: relative;
 }
 
-.heart-container {
+.heart-container, .text-container {
     position: absolute;
     width: 100vw;
     height: 100vh;
-}
-
-.heart-text {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    font-size: 28px;
-    font-family: Arial, sans-serif;
-    color: #ff4081;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-shadow: 0 0 10px rgba(255, 64, 129, 0.8);
 }
 
 .particle {
@@ -38,6 +22,25 @@ body {
     background-color: white;
     border-radius: 50%;
     opacity: 0.9;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
     transition: transform 2s ease-in-out, opacity 1.5s ease-in-out;
+}
+
+.particle-trail {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0));
+    transform: rotate(45deg);
+    opacity: 0.8;
+}
+
+.text-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0.9;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
 }
