@@ -6,15 +6,15 @@ canvas.height = window.innerHeight;
 
 const particles = [];
 const textParticles = [];
-const numParticles = 200;
-const numTextParticles = 50;
+const numParticles = 250;
 const heartScale = Math.min(canvas.width, canvas.height) / 25;
+const textSize = 2.5; // Kích thước hạt nhỏ hơn
 
 // Hàm vẽ hình trái tim
 function heartFunction(t) {
     return {
         x: 16 * Math.pow(Math.sin(t), 3),
-        y: - (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
+        y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
     };
 }
 
@@ -24,41 +24,60 @@ for (let i = 0; i < numParticles; i++) {
     let heartPos = heartFunction(t);
 
     particles.push({
-        x: canvas.width / 2 + heartPos.x * heartScale,
-        y: canvas.height / 2 + heartPos.y * heartScale,
-        size: Math.random() * 3 + 1,
-        opacity: Math.random() * 0.5 + 0.5
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        targetX: canvas.width / 2 + heartPos.x * heartScale,
+        targetY: canvas.height / 2 + heartPos.y * heartScale,
+        size: Math.random() * 2 + 1,
+        opacity: 0,
+        speed: Math.random() * 0.03 + 0.01,
+        blur: Math.random() * 5 + 2
     });
 }
 
-// Tạo chữ từ hạt sáng
-const text = "Anh yêu Thương";
-ctx.font = "bold 50px Arial";
-ctx.textAlign = "center";
-ctx.fillText(text, canvas.width / 2, canvas.height / 1.3);
-const textData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+// Vẽ chữ trên canvas ẩn để lấy vị trí pixel
+const textCanvas = document.createElement("canvas");
+const textCtx = textCanvas.getContext("2d");
+textCanvas.width = canvas.width;
+textCanvas.height = canvas.height;
+textCtx.font = "bold 80px Arial";
+textCtx.textAlign = "center";
+textCtx.fillStyle = "white";
+textCtx.fillText("Anh yêu Thương", canvas.width / 2, canvas.height / 2 + 20);
 
-for (let i = 0; i < numTextParticles; i++) {
-    let x, y;
-    do {
-        x = Math.random() * canvas.width;
-        y = Math.random() * canvas.height;
-    } while (textData.data[(Math.floor(y) * canvas.width + Math.floor(x)) * 4 + 3] === 0);
-
-    textParticles.push({
-        x,
-        y,
-        size: Math.random() * 3 + 1,
-        opacity: Math.random() * 0.5 + 0.5
-    });
+const textData = textCtx.getImageData(0, 0, canvas.width, canvas.height);
+for (let y = 0; y < textCanvas.height; y += 5) {
+    for (let x = 0; x < textCanvas.width; x += 5) {
+        let alpha = textData.data[(y * textCanvas.width + x) * 4 + 3];
+        if (alpha > 128) {
+            textParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                targetX: x,
+                targetY: y,
+                size: textSize,
+                opacity: 0,
+                speed: Math.random() * 0.03 + 0.01,
+                blur: Math.random() * 5 + 3
+            });
+        }
+    }
 }
 
 // Vẽ hạt sáng
-function drawParticles(particlesArray) {
+function drawParticles(particlesArray, color, glow) {
     particlesArray.forEach(p => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+        ctx.shadowColor = `rgba(${color}, 1)`;
+        ctx.shadowBlur = glow ? p.blur : 0;
+        ctx.fillStyle = `rgba(${color}, ${p.opacity})`;
         ctx.fill();
     });
 }
@@ -67,10 +86,23 @@ function drawParticles(particlesArray) {
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawParticles(particles);
-    drawParticles(textParticles);
+    particles.forEach(p => {
+        p.x += (p.targetX - p.x) * p.speed;
+        p.y += (p.targetY - p.y) * p.speed;
+        p.opacity += 0.02;
+    });
+
+    textParticles.forEach(p => {
+        p.x += (p.targetX - p.x) * p.speed;
+        p.y += (p.targetY - p.y) * p.speed;
+        p.opacity += 0.02;
+    });
+
+    drawParticles(particles, "255, 255, 255", true); // Trái tim màu trắng, có ánh sáng
+    drawParticles(textParticles, "255, 0, 0", true); // Chữ màu đỏ lấp lánh
 
     requestAnimationFrame(animate);
 }
 
+// Chạy animation
 animate();
