@@ -1,16 +1,13 @@
 body {
     margin: 0;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #b3e0dc;
-    height: 100vh;
+    background-color: #a2d2ff;
 }
 
 canvas {
-    display: block;
     position: absolute;
     top: 0;
     left: 0;
+    width: 100vw;
+    height: 100vh;
 }
