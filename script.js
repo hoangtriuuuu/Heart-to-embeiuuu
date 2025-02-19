@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d");
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    updateScale();
     createParticles();
 }
 
@@ -13,15 +14,16 @@ canvas.height = window.innerHeight;
 
 const particles = [];
 const textParticles = [];
-const numParticles = 250;
-let heartScale;
+const numParticles = 300; 
+let heartScale, fontSize;
 
 function updateScale() {
-    heartScale = Math.min(canvas.width, canvas.height) / 25;
+    heartScale = Math.min(canvas.width, canvas.height) / 25; 
+    fontSize = Math.min(canvas.width, canvas.height) / 12; // Chữ sẽ luôn vừa với màn hình
 }
+
 updateScale();
 
-// Hàm vẽ hình trái tim
 function heartFunction(t) {
     return {
         x: 16 * Math.pow(Math.sin(t), 3),
@@ -29,7 +31,6 @@ function heartFunction(t) {
     };
 }
 
-// Tạo hạt sáng cho trái tim
 function createParticles() {
     particles.length = 0;
     textParticles.length = 0;
@@ -47,19 +48,18 @@ function createParticles() {
             opacity: 0,
             speed: Math.random() * 0.03 + 0.01,
             blur: Math.random() * 5 + 2,
-            vx: 0, vy: 0 // Tốc độ bị đẩy
+            vx: 0, vy: 0
         });
     }
 
-    // Vẽ chữ trên canvas ẩn để lấy vị trí pixel
     const textCanvas = document.createElement("canvas");
     const textCtx = textCanvas.getContext("2d");
     textCanvas.width = canvas.width;
     textCanvas.height = canvas.height;
-    textCtx.font = "bold 80px Arial";
+    textCtx.font = `bold ${fontSize}px Arial`; // Cập nhật font chữ theo màn hình
     textCtx.textAlign = "center";
     textCtx.fillStyle = "white";
-    textCtx.fillText("Anh yêu Thương", canvas.width / 2, canvas.height / 2 + 20);
+    textCtx.fillText("Anh yêu Thương", canvas.width / 2, canvas.height / 2 + fontSize / 3);
 
     const textData = textCtx.getImageData(0, 0, canvas.width, canvas.height);
     for (let y = 0; y < textCanvas.height; y += 5) {
@@ -71,10 +71,10 @@ function createParticles() {
                     y: Math.random() * canvas.height,
                     targetX: x,
                     targetY: y,
-                    size: 2.5,
+                    size: 2,
                     opacity: 0,
                     speed: Math.random() * 0.03 + 0.01,
-                    blur: Math.random() * 5 + 3,
+                    blur: Math.random() * 4 + 3,
                     vx: 0, vy: 0
                 });
             }
@@ -83,7 +83,6 @@ function createParticles() {
 }
 createParticles();
 
-// Vẽ hạt sáng
 function drawParticles(particlesArray, color, glow) {
     particlesArray.forEach(p => {
         ctx.beginPath();
@@ -95,7 +94,7 @@ function drawParticles(particlesArray, color, glow) {
     });
 }
 
-// Xử lý chạm tay vuốt vào hạt
+// Chạm vào màn hình để đẩy hạt
 canvas.addEventListener("touchmove", function(event) {
     const touch = event.touches[0];
     const touchX = touch.clientX;
@@ -106,15 +105,14 @@ canvas.addEventListener("touchmove", function(event) {
         let dy = p.y - touchY;
         let distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 50) { 
-            let force = (50 - distance) / 10; 
+        if (distance < 50) {
+            let force = (50 - distance) / 10;
             p.vx = dx * force * 0.1;
             p.vy = dy * force * 0.1;
         }
     });
 });
 
-// Animation
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -135,10 +133,9 @@ function animate() {
     });
 
     drawParticles(particles, "255, 255, 255", true);
-    drawParticles(textParticles, "255, 182, 193", true); // Hồng pastel
+    drawParticles(textParticles, "255, 105, 180", true); // Hồng pastel
 
     requestAnimationFrame(animate);
 }
 
-// Chạy animation
 animate();
