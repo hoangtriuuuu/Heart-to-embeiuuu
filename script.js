@@ -1,48 +1,76 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const heartShape = [
-        [50, 20], [42, 12], [35, 18], [30, 30], [33, 45],
-        [40, 55], [50, 70], [60, 55], [67, 45], [70, 30],
-        [65, 18], [58, 12], [50, 20]
-    ];
+const canvas = document.getElementById("heartCanvas");
+const ctx = canvas.getContext("2d");
 
-    const textShape = [
-        [45, 60], [50, 60], [55, 60], // "A"
-        [46, 65], [52, 65], [58, 65], // "n"
-        [48, 70], [54, 70], [60, 70]  // "h"
-    ];
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-    const container = document.getElementById("heartContainer");
-    const textContainer = document.getElementById("textContainer");
+const particles = [];
+const textParticles = [];
+const numParticles = 200;
+const numTextParticles = 50;
+const heartScale = Math.min(canvas.width, canvas.height) / 25;
 
-    function createParticles(shape, targetContainer, className) {
-        shape.forEach(point => {
-            let particle = document.createElement("div");
-            particle.classList.add(className);
-            particle.style.left = `${(point[0] / 100) * window.innerWidth}px`;
-            particle.style.top = `${(point[1] / 100) * window.innerHeight}px`;
-            targetContainer.appendChild(particle);
-        });
-    }
+// Hàm vẽ hình trái tim
+function heartFunction(t) {
+    return {
+        x: 16 * Math.pow(Math.sin(t), 3),
+        y: - (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
+    };
+}
 
-    function animateParticles(container, className, delay) {
-        let particles = container.getElementsByClassName(className);
-        let index = 0;
+// Tạo hạt sáng cho trái tim
+for (let i = 0; i < numParticles; i++) {
+    let t = Math.random() * Math.PI * 2;
+    let heartPos = heartFunction(t);
 
-        function animate() {
-            if (index < particles.length) {
-                particles[index].style.opacity = 1;
-                particles[index].style.transform = "scale(1.3)";
-                index++;
-                requestAnimationFrame(animate);
-            }
-        }
+    particles.push({
+        x: canvas.width / 2 + heartPos.x * heartScale,
+        y: canvas.height / 2 + heartPos.y * heartScale,
+        size: Math.random() * 3 + 1,
+        opacity: Math.random() * 0.5 + 0.5
+    });
+}
 
-        setTimeout(() => animate(), delay);
-    }
+// Tạo chữ từ hạt sáng
+const text = "Anh yêu Thương";
+ctx.font = "bold 50px Arial";
+ctx.textAlign = "center";
+ctx.fillText(text, canvas.width / 2, canvas.height / 1.3);
+const textData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-    createParticles(heartShape, container, "particle");
-    createParticles(textShape, textContainer, "text-particle");
+for (let i = 0; i < numTextParticles; i++) {
+    let x, y;
+    do {
+        x = Math.random() * canvas.width;
+        y = Math.random() * canvas.height;
+    } while (textData.data[(Math.floor(y) * canvas.width + Math.floor(x)) * 4 + 3] === 0);
 
-    setTimeout(() => animateParticles(container, "particle", 500), 500);
-    setTimeout(() => animateParticles(textContainer, "text-particle", 1200), 2000);
-});
+    textParticles.push({
+        x,
+        y,
+        size: Math.random() * 3 + 1,
+        opacity: Math.random() * 0.5 + 0.5
+    });
+}
+
+// Vẽ hạt sáng
+function drawParticles(particlesArray) {
+    particlesArray.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx.fill();
+    });
+}
+
+// Animation
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawParticles(particles);
+    drawParticles(textParticles);
+
+    requestAnimationFrame(animate);
+}
+
+animate();
