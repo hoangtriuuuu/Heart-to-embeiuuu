@@ -1,0 +1,39 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #b3e0dc;
+    overflow: hidden;
+    margin: 0;
+    position: relative;
+}
+
+.heart-container {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+}
+
+.heart-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-family: Arial, sans-serif;
+    color: #ff4081;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.particle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0.8;
+}
