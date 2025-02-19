@@ -5,49 +5,38 @@ document.addEventListener("DOMContentLoaded", function() {
         [70, 15], [60, 10], [50, 20]
     ];
 
+    const textShape = [
+        [40, 60], [45, 60], [50, 60], [55, 60], [60, 60],  // "A"
+        [42, 65], [48, 65], [52, 65], [58, 65], [62, 65],  // "n"
+        [44, 70], [50, 70], [54, 70], [60, 70], [64, 70],  // "h"
+    ];
+
     const container = document.getElementById("heartContainer");
-    const particles = [];
-    const numParticles = 100; // Tăng số lượng hạt sáng
+    const textContainer = document.getElementById("textContainer");
 
-    function createParticles() {
-        for (let i = 0; i < numParticles; i++) {
+    function createParticles(shape, targetContainer, className) {
+        shape.forEach(point => {
             let particle = document.createElement("div");
-            particle.classList.add("particle");
-            particle.style.left = `${Math.random() * window.innerWidth}px`;
-            particle.style.top = `${Math.random() * window.innerHeight}px`;
-            container.appendChild(particle);
-            particles.push(particle);
-        }
+            particle.classList.add(className);
+            particle.style.left = `${(point[0] / 100) * window.innerWidth}px`;
+            particle.style.top = `${(point[1] / 100) * window.innerHeight}px`;
+            targetContainer.appendChild(particle);
+        });
     }
 
-    function animateParticles() {
-        let progress = 0;
-        function step() {
-            progress += 0.02;
-            particles.forEach((particle, index) => {
-                let target = heartShape[index % heartShape.length];
-                let endX = (target[0] / 100) * window.innerWidth;
-                let endY = (target[1] / 100) * window.innerHeight;
-
-                let startX = parseFloat(particle.style.left);
-                let startY = parseFloat(particle.style.top);
-
-                let x = (1 - progress) * startX + progress * endX;
-                let y = (1 - progress) * startY + progress * endY;
-
-                particle.style.transform = `translate(${x - startX}px, ${y - startY}px) scale(${1.2 - progress * 0.2})`;
-                particle.style.opacity = Math.max(0.5, 1 - progress);
+    function animateParticles(container, className, delay) {
+        setTimeout(() => {
+            let particles = container.getElementsByClassName(className);
+            Array.from(particles).forEach(particle => {
+                particle.style.opacity = 1;
+                particle.style.transform = "scale(1.2)";
             });
-
-            if (progress < 1) {
-                requestAnimationFrame(step);
-            } else {
-                document.getElementById("heartText").style.opacity = 1;
-            }
-        }
-        step();
+        }, delay);
     }
 
-    createParticles();
-    setTimeout(animateParticles, 500);
+    createParticles(heartShape, container, "particle");
+    createParticles(textShape, textContainer, "text-particle");
+
+    setTimeout(() => animateParticles(container, "particle", 500), 500);
+    setTimeout(() => animateParticles(textContainer, "text-particle", 1500), 2000);
 });
